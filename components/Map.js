@@ -1,7 +1,6 @@
 import React, {useEffect} from 'react'
 
-
-const Map = props => {
+const Map = ({ stores }) => {
     useEffect(() => {
         var container = document.getElementById('map');
         var mapOptions = {
@@ -11,7 +10,14 @@ const Map = props => {
         }
         var map = new kakao.maps.Map(container, mapOptions); //지도 생성 및 객체 리턴
 
-    }, []);
+        stores.map((store) => {
+          var marker = new kakao.maps.Marker({
+            map: map,
+            position: new kakao.maps.LatLng(store.lat, store.lng),
+            title: store.name, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+          });
+        })
+    }, [stores]);
 
     return (
       <div>
