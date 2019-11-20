@@ -3,6 +3,7 @@ import Head from 'next/head'
 import Navigation from '../components/Nav'
 import Map from '../components/Map'
 import StoreList from '../components/StoreList'
+import { RoundButton } from '../components/Buttons'
 import "bootstrap/dist/css/bootstrap.css"
 
 const stores = [
@@ -33,8 +34,10 @@ const Home = () => (
     <Navigation />
     <Map stores={stores}/>
     <StoreList />
+    <RoundButton />
 
     <style jsx>{`
+
     `}</style>
   </div>
 );
