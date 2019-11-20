@@ -34,11 +34,11 @@ const Store = ({name, score, address}) => {
               >
                 <strong>{name}</strong>
               </a>
-              <div className="float-right">
+              <span className="float-right">
                 {[...Array(score)].map((e, i) => <FontAwesomeIcon icon={faStar} key={i} />)}
-              </div>
+              </span>
             </p>
-            <div className="clearfix"></div>
+            <div className="clearfix"/>
             <p>{address}</p>
           </div>
         </div>
