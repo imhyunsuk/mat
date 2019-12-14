@@ -1,55 +1,161 @@
-import React, { useEffect } from "react";
-import {
-  Card,
-  CardImg,
-  CardText,
-  CardBody,
-  CardTitle,
-  CardSubtitle,
-  Button,
-  ListGroupItem
-} from "reactstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar } from "@fortawesome/free-solid-svg-icons";
+import React, { useState, useEffect, useRef } from "react";
+import { ListGroupItem } from "reactstrap";
+import StarRating from  '../components/StarRating';
+import { gql } from "apollo-boost";
+import { useLazyQuery, useMutation } from "@apollo/react-hooks";
 
-const Store = ({name, score, address}) => {
 
-  useEffect(() => {}, []);
+const CHANGE_RATING = gql`
+  mutation ChangeRating($ratingId: ID, $storeName: String, $storeAddress: String, $score: Int!) {
+    changeRating(ratingId: $ratingId, storeName: $storeName, storeAddress: $storeAddress, score: $score) {
+      id
+      score
+    }
+  }
+`;
+
+const ADD_RATING = gql`
+  mutation AddRating(
+    $storeName: String!,
+    $storeLatitude: Float!,
+    $storeLongitude: Float!,
+    $storeAddress: String!,
+    $storeDescription: String,
+    $score: Int!
+  ) {
+    addRating(
+      storeName: $storeName,
+      storeLatitude: $storeLatitude,
+      storeLongitude: $storeLongitude,
+      storeAddress: $storeAddress,
+      storeDescription: $storeDescription
+      score: $score
+    ) {
+      id
+      score
+    }
+  }
+`;
+
+const FIND_RATING = gql`
+  mutation FindRatingID(
+    $storeName: String!
+    $storeAddress: String!
+  ) {
+    findRatingID(
+      storeName: $storeName
+      storeAddress: $storeAddress
+    ) {
+      id
+    }
+  }
+`;
+
+
+const Store = ({name, score, address, ratingId, category, latitude, longitude }) => {
+
+  const [starNumber, setStarNumber] = useState(score);
+  const starRatingRef = useRef();
+  const [
+    changeRating,
+  ] = useMutation(CHANGE_RATING);
+  const [
+    addRating,
+    { loading: mutationLoading, error: mutationError }
+  ] = useMutation(ADD_RATING);
+  const [ findRatingID, { loading, data }] = useMutation(FIND_RATING);
+  
+  useEffect(() => {
+    if (!ratingId && starRatingRef.current !== score ) {
+      changeRating({
+        variables: {
+          storeName: name,
+          storeAddress: address,
+          score: starNumber
+        }
+      })
+      .then(res => {
+        console.log(`Change ratingId to score ${starNumber}`);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    }
+
+    if (!!ratingId && starRatingRef.current !== score) {
+      changeRating({
+        variables: {
+          ratingId: ratingId,
+          score: starNumber
+        }
+      })
+      .then(res => {
+        console.log(`Change ratingId to score ${starNumber}`);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    }
+
+    if (!ratingId && score === 0 && starRatingRef.current !== 0) {
+      addRating({
+        variables: {
+          storeName: name,
+          storeLatitude: parseFloat(latitude),
+          storeLongitude: parseFloat(longitude),
+          storeAddress: address,
+          score: starNumber
+        }
+      })
+        .then(res => {
+          console.log(res);
+        })
+        .catch(err => {
+          alert(err);
+        });
+    }
+  }, [starNumber]);
 
   return (
-    <div>
-      <ListGroupItem>
-        <div className="row">
-          <div className="col-3">
-            <img
-              src="https://image.ibb.co/jw55Ex/def_face.jpg"
-              className="img img-rounded img-fluid"
-            />
+    <ListGroupItem>
+      {/* {mutationLoading && <p>{changeRating.error}</p>}
+      {mutationError && <p>{changeRating.error}</p>} */}
+      <div className="row">
+        <div href="#" className="col-12">
+          <div>
+            <strong className="float-left">{name}</strong>
+            <span className="float-right">
+              {
+                <StarRating
+                  totalStars={5}
+                  starNumber={starNumber}
+                  setStarNumber={setStarNumber}
+                  ratingId={ratingId}
+                  ref={starRatingRef}
+                />
+              }
+            </span>
           </div>
-          <div className="col-9">
-            <p>
-              <a
-                className="float-left"
-                href="https://maniruzzaman-akash.blogspot.com/p/contact.html"
-              >
-                <strong>{name}</strong>
-              </a>
-              <span className="float-right">
-                {[...Array(score)].map((e, i) => <FontAwesomeIcon icon={faStar} key={i} />)}
-              </span>
-            </p>
-            <div className="clearfix"/>
-            <p>{address}</p>
-          </div>
+          <div className="clearfix" />
+          <div>{address}</div>
         </div>
-      </ListGroupItem>
+      </div>
 
-      <style jsx>
-        {`
-        `}
-      </style>
-    </div>
+      <style jsx>{`
+        strong {
+          color: #006eee;
+        }
+
+        a {
+          color: black;
+        }
+      `}</style>
+    </ListGroupItem>
   );
 };
+
+Store.defaultProps = {
+  score : 0,
+}
 
 export default Store;
