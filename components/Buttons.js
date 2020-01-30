@@ -21,6 +21,7 @@ export const StoreAddButton = ({onClick}) => {
                     color: white;
                     font-size: 30px;
                     font-weight: bold;
+                    z-index: 100;
                 }
             `}</style>
         </div>

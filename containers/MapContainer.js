@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import Map from "../components/Map";
-
 import { gql } from "apollo-boost";
 import { useQuery } from "@apollo/react-hooks";
+import Map from "../components/Map";
 import { StoreAddButton } from "../components/Buttons";
 import StoreList from "../components/StoreList";
 import StoreAddModal from "../components/StoreAddModal";

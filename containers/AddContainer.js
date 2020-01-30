@@ -1,8 +1,10 @@
-import React, { useContext, useState, useEffect } from "react";
-import Map from "../components/Map";
+import React, { createRef, useState, useEffect, useRef } from "react";
+import SearchMap from "../components/SearchMap";
+
 import { gql } from "apollo-boost";
 import { useQuery } from "@apollo/react-hooks";
-import StoreList from "../components/Mobile/StoreList";
+import StoreAddList from "../components/Mobile/StoreAddList";
+import { useAppContext } from "../lib/context";
 import Drawer from "../components/Drawer"
 
 const GET_MYRATINGS = gql`
@@ -34,9 +36,10 @@ const initOverlay = () => {
   }
 }
 
-const MobileContainer = () => {
+const AddContainer = () => {
   const { loading, error, data, refetch } = useQuery(GET_MYRATINGS);
   const [expanded, setExpanded] = useState(false)
+  const { stores, setStores } = useAppContext();
   const [overlay, setOverlay] = useState(initOverlay)
 
   const mapClick = () => {
@@ -46,49 +49,64 @@ const MobileContainer = () => {
     setExpanded(true);
   };
 
+  const filteredData = stores.map((store, idx) => {
+    let rating = data.myRatings.find(rating => {
+        return (
+            rating.store.name == store.place_name &&
+            rating.store.address == store.address_name
+        );
+    });
+    return rating ? { ...store, score: rating.score } : store;
+  });
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>`Error! ${error.message}`</p>;
 
   return (
     <div>
       <div className={expanded ? "expanded-map" : "map"} onClick={mapClick}>
-        <Map ratings={data.myRatings} overlay={overlay}/>
+        <SearchMap stores={stores} overlay={overlay}/>
       </div>
       <div
         className={expanded ? "expanded-drawer" : "drawer"}
         onClick={drawerClick}
       >
         <Drawer expanded={expanded}>
-          <StoreList ratings={data.myRatings} overlay={overlay}/>
+          <StoreAddList 
+            ratings={data.myRatings}
+            stores={filteredData}
+            setStores={setStores}
+            overlay={overlay}
+          />
         </Drawer>
       </div>
-      <style jsx>{`
-        #kakaomap {
-          height: 100%;
-        }
+    <style jsx>{`
+    #kakaomap {
+      height: 100%;
+    }
 
-        .expanded-map {
-          height: 43vh;
-          width: 100%;
-        }
+    .expanded-map {
+      height: 43vh;
+      width: 100%;
+    }
 
-        .map {
-          height: 65vh;
-          width: 100%;
-        }
+    .map {
+      height: 65vh;
+      width: 100%;
+    }
 
-        .expanded-drawer {
-          height: 70vh;
-          width: 100%;
-        }
+    .expanded-drawer {
+      height: 70vh;
+      width: 100%;
+    }
 
-        .drawer {
-          height: 30vh;
-          width: 100%;
-        }
-      `}</style>
+    .drawer {
+      height: 30vh;
+      width: 100%;
+    }
+  `}</style>
     </div>
   );
 };
 
-export default MobileContainer;
+export default AddContainer;

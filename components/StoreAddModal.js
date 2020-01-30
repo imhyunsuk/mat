@@ -33,7 +33,6 @@ const StoreAddModal = (props) => {
 
   const filteredData = stores.map((store, idx) => {
     let rating = props.ratings.find(rating => {
-      console.log(rating.store.latitude, parseFloat(store.y))
       return (
         rating.store.name == store.place_name &&
         rating.store.address == store.address_name

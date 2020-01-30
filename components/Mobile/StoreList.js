@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { ListGroup } from "reactstrap";
-import Store from './Store';
-import Search from './Search';
+import Store from '../Store';
+import { useAppContext } from "../../lib/context";
 
-
-const StoreList = ({query, ratings}) => {
-  const lowercasedFilter = query.toLowerCase();
+const StoreList = ({ratings, overlay}) => {
+  const { query, setQuery } = useAppContext()
+  const lowercasedFilter = query.toString().toLowerCase();
   const filteredData = ratings.filter(rating =>
     rating.store.name.toLowerCase().includes(lowercasedFilter)
   );
@@ -22,13 +22,16 @@ const StoreList = ({query, ratings}) => {
             ratingId={id}
             latitude={store.latitude}
             longitude={store.longitude}
+            overlay={overlay}
           />
         ))}
       </ListGroup>
       <style jsx>
         {`
-          a{
-            color: black;
+          div {
+            border-top: solid #f7f7f7;
+            height: 50vh;
+            overflow: scroll;
           }
         `}
       </style>

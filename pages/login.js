@@ -1,8 +1,8 @@
 import React from "react";
 import Head from "next/head";
-import Navigation from "../components/Nav";
 import LoginForm from "../components/LoginForm"
 import "bootstrap/dist/css/bootstrap.css";
+import Main from "../layout/Main";
 
 const Login = () => (
   <div>
@@ -10,8 +10,9 @@ const Login = () => (
       <title>Login</title>
       <link rel="icon" href="/favicon.ico" />
     </Head>
-    <LoginForm />
-
+    <Main>
+      <LoginForm />
+    </Main>
     <style jsx>{``}</style>
   </div>
 );

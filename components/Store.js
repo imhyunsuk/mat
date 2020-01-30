@@ -3,7 +3,7 @@ import { ListGroupItem } from "reactstrap";
 import StarRating from  '../components/StarRating';
 import { gql } from "apollo-boost";
 import { useLazyQuery, useMutation } from "@apollo/react-hooks";
-
+import { useAppContext } from "../lib/context";
 
 const CHANGE_RATING = gql`
   mutation ChangeRating($ratingId: ID, $storeName: String, $storeAddress: String, $score: Int!) {
@@ -52,7 +52,7 @@ const FIND_RATING = gql`
 `;
 
 
-const Store = ({name, score, address, ratingId, category, latitude, longitude }) => {
+const Store = ({ name, score, address, ratingId, category, latitude, longitude, overlay }) => {
 
   const [starNumber, setStarNumber] = useState(score);
   const starRatingRef = useRef();
@@ -63,10 +63,21 @@ const Store = ({name, score, address, ratingId, category, latitude, longitude })
     addRating,
     { loading: mutationLoading, error: mutationError }
   ] = useMutation(ADD_RATING);
-  const [ findRatingID, { loading, data }] = useMutation(FIND_RATING);
-  
+  const { map } = useAppContext();
+
+  const onClick = async () => {
+    const position = new kakao.maps.LatLng(latitude, longitude);
+    map.setCenter(position);
+
+    overlay.setMap(null);
+    const content = `<div class ="label"><span class="left"></span><span class="center">${name}</span><span class="right"></span></div>`;
+    overlay.setPosition(position);
+    overlay.setContent(content);
+    overlay.setMap(map);
+  }
+
   useEffect(() => {
-    if (!ratingId && starRatingRef.current !== score ) {
+    if (!ratingId && score!==0 && starRatingRef.current !== score ) {
       changeRating({
         variables: {
           storeName: name,
@@ -120,10 +131,10 @@ const Store = ({name, score, address, ratingId, category, latitude, longitude })
     <ListGroupItem>
       {/* {mutationLoading && <p>{changeRating.error}</p>}
       {mutationError && <p>{changeRating.error}</p>} */}
-      <div className="row">
-        <div href="#" className="col-12">
+      <div className="row" onClick={() => onClick(latitude, longitude)}>
+        <div className="col-12">
           <div>
-            <strong className="float-left">{name}</strong>
+            <strong className="float-left" >{name}</strong>
             <span className="float-right">
               {
                 <StarRating

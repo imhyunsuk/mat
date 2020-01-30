@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, forwardRef } from "react";
+import React, { useEffect, forwardRef } from "react";
 import { gql } from "apollo-boost";
 import { useMutation } from "@apollo/react-hooks";
 
@@ -10,8 +10,8 @@ const Star = ({ selected = false, onClick = f => f }) => (
         .star {
           cursor: pointer;
           position: relative;
-          width: 1.2rem;
-          height: 1.2rem;
+          width: 1.3rem;
+          height: 1.3rem;
           backgroun: black;
           background-color: rgb(203, 211, 227);
 

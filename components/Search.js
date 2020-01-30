@@ -1,40 +1,40 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useContext, forwardRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { useAppContext } from "../lib/context";
+import { useRouter } from 'next/router';
 
-const Search = ({ query, onChange, onClick }) => {
 
+const Search = () => {
+  const { setQuery, searchClick } = useAppContext();
   const pressEnter = e => {
-    if(e.keyCode==13) onClick();
+    if(e.keyCode==13) searchClick();
   };
-  const searchInput = useRef(null);
-  useEffect(() => {
-    searchInput.current.focus();
-  }, [])
+  const onChange = e => {
+    setQuery(e.target.value)
+  }
 
   return (
     <div className="inline">
       <div className="inside">
         <input
           type="text"
-          value={query}
           placeholder="장소 검색..."
           onChange={onChange}
           onKeyDown={pressEnter}
-          ref={searchInput}
         />
-        <button type="button" className="icon float-right" onClick={onClick}>
+        <button type="button" className="icon float-right" onClick={searchClick}>
           <FontAwesomeIcon icon={faSearch} />
         </button>
       </div>
       <style jsx>
         {`
           .inline {
-            width: 90%;
+            width: 88%;
             height: 36px;
-            margin: 10px auto 10px;
+            margin: 4px auto 4px;
             border: 1px solid #dddddd;
-            border-radius: 24px;
+            border-radius: 8px;
             background-color: white;
           }
 

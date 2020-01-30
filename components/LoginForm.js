@@ -1,21 +1,18 @@
 import React, { useState } from "react";
 import {
-  Card,
-  CardBody,
-  CardFooter,
   Container,
-  Col,
   Form,
   FormGroup,
   FormFeedback,
-  Label,
   Input,
   Button,
-  Row
 } from "reactstrap";
+import Link from "next/link";
 import { gql } from "apollo-boost";
 import { useMutation } from "@apollo/react-hooks";
 import { signin } from '../lib/auth';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 
 const LOGIN = gql`
@@ -84,63 +81,50 @@ const LoginForm = () => {
     if (e.key === 'Enter') submitForm();
   };
 
-
   return (
-    <Row className="justify-content-center my-5">
-      <Col lg="6" sm="8">
-        <Container fluid>
-          <h2>로그인</h2>
-          <Card>
-            <CardBody>
-              <Form className="form">
-                <Col>
-                  <FormGroup>
-                    <Label>Email</Label>
-                    <Input
-                      type="email"
-                      onBlur={validateEmail}
-                      placeholder="myemail@email.com"
-                      autoFocus
-                      className={account.validate.email}
-                    />
-                    {account.validate.email == "is-invalid" && (
-                      <FormFeedback>{account.errors.email}</FormFeedback>
-                    )}
-                  </FormGroup>
-                </Col>
-                <Col>
-                  <FormGroup>
-                    <Label for="examplePassword">비밀번호</Label>
-                    <Input
-                      type="password"
-                      onBlur={setPassword}
-                      placeholder="********"
-                      className={account.validate.password}
-                      onKeyPress={pressEnter}
-                    />
-                    {account.validate.password == "is-invalid" && (
-                      <FormFeedback>{account.errors.password}</FormFeedback>
-                    )}
-                  </FormGroup>
-                </Col>
-              </Form>
-              {mutationLoading && <p>{login.error}</p>}
-              {mutationError && <p>{login.error}</p>}
-            </CardBody>
-            <CardFooter className="text-center">
-              <Button onClick={submitForm}>로그인</Button>
-              <a href="/" className="btn btn-outline-secondary mx-3">
-                취소
-              </a>
-            </CardFooter>
-          </Card>
-        </Container>
-      </Col>
-
-      <style jsx>
-        {``}
-      </style>
-    </Row>
+    <Container fluid>
+      <Form className="my-5">
+        <FormGroup>
+          <h6>Email</h6>
+          <Input
+            type="email"
+            onBlur={validateEmail}
+            placeholder="myemail@email.com"
+            autoFocus
+            className={account.validate.email}
+            bsSize="lg"
+          />
+          {account.validate.email == "is-invalid" && (
+            <FormFeedback>{account.errors.email}</FormFeedback>
+          )}
+        </FormGroup>
+        <FormGroup className="mt-4">
+          <h6>비밀번호</h6>
+          <Input
+            type="password"
+            onChange={setPassword}
+            placeholder="********"
+            className={account.validate.password}
+            onKeyPress={pressEnter}
+            bsSize="lg"
+          />
+          {account.validate.password == "is-invalid" && (
+            <FormFeedback>{account.errors.password}</FormFeedback>
+          )}
+        </FormGroup>
+      </Form>
+      {mutationLoading && <p>{login.error}</p>}
+      {mutationError && <p>{login.error}</p>}
+      <Button onClick={submitForm} block size="lg">
+        로그인
+      </Button>
+      <Link href="/mobile/signup">
+        <Button color="info" outline block size="lg" className="mt-5">
+          회원가입 <FontAwesomeIcon icon={faChevronRight} />
+        </Button>
+      </Link>
+      <style jsx>{``}</style>
+    </Container>
   );
 }
 

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useAppContext } from "../lib/context";
 
-const SearchMap = ({stores}) => {
-  const [position, setPosition] = useState({
-    latitude: 33.450701,
-    longitude: 126.570667
-  });
+const SearchMap = ({stores, overlay}) => {
+  const [position, setPosition] = useState({ "latitude": 37.435887, "longitude": 126.984063 });
+  const { setMap } = useAppContext();
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -28,33 +27,78 @@ const SearchMap = ({stores}) => {
       alert("GPS를 지원하지 않습니다");
     }
 
-    var container = document.getElementById("searchmap");
-    var mapOptions = {
+    const container = document.getElementById("searchmap");
+    const mapOptions = {
       center: new kakao.maps.LatLng(position.latitude, position.longitude),
       level: 10, //지도의 레벨(확대, 축소 정도)
       clickable: true
     };
-    var map = new kakao.maps.Map(container, mapOptions); //지도 생성 및 객체 리턴
+    const map = new kakao.maps.Map(container, mapOptions); //지도 생성 및 객체 리턴
 
-    if(stores){
-      stores.map((store) => {
-        var marker = new kakao.maps.Marker({
-          map: map,
-          position: new kakao.maps.LatLng(store.y, store.x),
-          title: store.name // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
-        });
+    stores.map((store) => {
+      const position = new kakao.maps.LatLng(store.y, store.x);
+      const marker = new kakao.maps.Marker({
+        map: map,
+        position: position,
+        title: store.place_name // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
       });
-    }
+
+      const displayInfo = () => {
+        overlay.setMap(null);
+        const content = `<div class ="label"><span class="left"></span><span class="center">${store.place_name}</span><span class="right"></span></div>`;
+        overlay.setPosition(position);
+        overlay.setContent(content);
+        overlay.setMap(map);
+      };
+
+      kakao.maps.event.addListener(marker, "click", function () {
+        displayInfo();
+      });
+    });
+    
+    setMap(map);
   }, [stores]);
 
   return (
-    <div>
-      <div id="searchmap">Map</div>
+    <div id="searchmap">
+      지도 로딩중...
 
-      <style jsx>
+      <style jsx global>
         {`
           #searchmap {
-            height: 80vh;
+            height: 100%;
+          }
+          .label {
+            margin-bottom: 96px;
+          }
+          .label * {
+            display: inline-block;
+            vertical-align: top;
+          }
+          .label .left {
+            background: url("http://t1.daumcdn.net/localimg/localimages/07/2011/map/storeview/tip_l.png")
+              no-repeat;
+            display: inline-block;
+            height: 32px;
+            overflow: hidden;
+            vertical-align: top;
+            width: 7px;
+          }
+          .label .center {
+            background: url(http://t1.daumcdn.net/localimg/localimages/07/2011/map/storeview/tip_bg.png)
+              repeat-x;
+            display: inline-block;
+            height: 32px;
+            font-size: 16px;
+            line-height: 24px;
+          }
+          .label .right {
+            background: url("http://t1.daumcdn.net/localimg/localimages/07/2011/map/storeview/tip_r.png") -1px
+              0 no-repeat;
+            display: inline-block;
+            height: 32px;
+            overflow: hidden;
+            width: 6px;
           }
         `}
       </style>
